@@ -1,30 +1,30 @@
-import React from 'react'
-import { NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { Provider, useSelector } from 'react-redux'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { store } from './src/store/store'
-import UserList from './src/screens/UserList/UserList'
-import { UserForm } from './src/screens/UserForm/UserForm'
-import { ToastProvider } from 'react-native-toast-notifications'
-import { UserInfo } from './src/screens/UserInfo/UserInfo'
-//import PostForm from './src/screens/PostForm/PostForm' // Se till att PostForm är korrekt importerad
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Provider, useSelector } from 'react-redux';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { store } from './src/store/store';
+import UserList from './src/screens/UserList/UserList';
+import { UserForm } from './src/screens/UserForm/UserForm';
+import { ToastProvider } from 'react-native-toast-notifications';
+import { UserInfo } from './src/screens/UserInfo/UserInfo';
 
-const UserListStack = createNativeStackNavigator()
+const UserListStack = createNativeStackNavigator();
 
 const UserListStackScreen = () => {
     return (
         <UserListStack.Navigator>
             <UserListStack.Screen name="UserList" component={UserList} />
             <UserListStack.Screen name="UserInfo" component={UserInfo} />
+            <UserListStack.Screen name="UserForm" component={UserForm} />
         </UserListStack.Navigator>
-    )
-}
+    );
+};
 
-const Tab = createBottomTabNavigator()
+const Tab = createBottomTabNavigator();
 
 const NavigationWrapper = () => {
-    const loggedInAs = useSelector((state: any) => state.auth.loggedInAs)
+    const loggedInAs = useSelector((state: any) => state.auth.loggedInAs);
 
     return (
         <NavigationContainer>
@@ -34,7 +34,7 @@ const NavigationWrapper = () => {
                     component={UserListStackScreen}
                     options={{ headerShown: false }}
                 />
-                <Tab.Screen name="UserForm" component={UserForm} />
+                <Tab.Screen name="Create User" component={UserForm} />
                 {loggedInAs && (
                     <Tab.Screen
                         name="UserInfo"
@@ -46,8 +46,8 @@ const NavigationWrapper = () => {
                 )}
             </Tab.Navigator>
         </NavigationContainer>
-    )
-}
+    );
+};
 
 export default function App() {
     return (
@@ -56,5 +56,5 @@ export default function App() {
                 <NavigationWrapper />
             </Provider>
         </ToastProvider>
-    )
-}
+    );
+};

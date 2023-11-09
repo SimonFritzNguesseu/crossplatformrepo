@@ -1,31 +1,41 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
-import { db } from '../../../firebase-config';
-import { addDoc, doc, deleteDoc, collection, getDocs, updateDoc } from "firebase/firestore";
+import { createApi } from '@reduxjs/toolkit/query/react'
+import { db } from '../../../firebase-config'
+import {
+    addDoc,
+    doc,
+    deleteDoc,
+    collection,
+    getDocs,
+    updateDoc
+} from 'firebase/firestore'
 
 const firebaseBaseQuery = async ({ baseUrl, url, method, body }) => {
     switch (method) {
         case 'GET':
-            const snapshot = await getDocs(collection(db, url));
-            const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            return { data };
+            const snapshot = await getDocs(collection(db, url))
+            const data = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data()
+            }))
+            return { data }
 
         case 'POST':
-            const docRef = await addDoc(collection(db, url), body);
-            return { data: { id: docRef.id, ...body } };
+            const docRef = await addDoc(collection(db, url), body)
+            return { data: { id: docRef.id, ...body } }
 
         case 'DELETE':
-            await deleteDoc(doc(db, url, body));
-            return { data: { id: body } };
+            await deleteDoc(doc(db, url, body))
+            return { data: { id: body } }
 
         case 'PUT':
-            const { id, ...updateFields } = body;
-            await updateDoc(doc(db, url, id), updateFields);
-            return { data: { id, ...updateFields } };
+            const { id, ...updateFields } = body
+            await updateDoc(doc(db, url, id), updateFields)
+            return { data: { id, ...updateFields } }
 
         default:
-            throw new Error(`Unhandled method ${method}`);
+            throw new Error(`Unhandled method ${method}`)
     }
-};
+}
 
 export const usersApi = createApi({
     reducerPath: 'usersApi',
@@ -67,8 +77,13 @@ export const usersApi = createApi({
                 body: user
             }),
             invalidatesTags: ['users']
-        }),
-    }),
-});
+        })
+    })
+})
 
-export const { useCreateUserMutation, useGetUsersQuery, useDeleteUserMutation, useUpdateUserMutation } = usersApi;
+export const {
+    useCreateUserMutation,
+    useGetUsersQuery,
+    useDeleteUserMutation,
+    useUpdateUserMutation
+} = usersApi

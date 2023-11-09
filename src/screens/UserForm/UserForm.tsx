@@ -15,23 +15,20 @@ import { useToast } from 'react-native-toast-notifications'
 
 export const UserForm = ({ route, navigation }) => {
     const lastNameRef = useRef(null)
-    const [id, setId] = useState(null)
-    const [firstName, setFirstName] = useState('')
-    const [lastName, setLastName] = useState('')
+    const [id, setId] = useState(route?.params?.user?.id || '')
+    const [firstName, setFirstName] = useState(
+        route?.params?.user?.firstName || ''
+    )
+    const [lastName, setLastName] = useState(
+        route?.params?.user?.lastName || ''
+    )
     const [createUser, { isLoading: isCreating }] = useCreateUserMutation()
     const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation()
     const toast = useToast()
 
-    useEffect(() => {
-        if (route.params?.user) {
-            const { user } = route.params
-            setId(user.id)
-            setFirstName(user.firstName)
-            setLastName(user.lastName)
-        }
-    }, [route.params])
+    const isUpdatingUser = id !== '' // Om vi har ett ID, betyder det att vi uppdaterar en användare
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (firstName === '' || lastName === '') {
             toast.show('Please fill out all inputs', {
                 type: 'warning',
@@ -42,46 +39,28 @@ export const UserForm = ({ route, navigation }) => {
             return
         }
 
-        if (id) {
-            // Update existing user
-            updateUser({
-                user: { id: id, firstName: firstName, lastName: lastName }
-            })
-                .then(() => {
-                    navigation.navigate('UserList')
-                    toast.show(
-                        `Användaren ${firstName} ${lastName} har uppdaterats!`,
-                        {
-                            type: 'success',
-                            placement: 'top',
-                            duration: 4000,
-                            animationType: 'slide-in'
-                        }
-                    )
+        try {
+            if (isUpdatingUser) {
+                await updateUser({ user: { id, firstName, lastName } })
+                toast.show('Användaren uppdaterad!', {
+                    type: 'success',
+                    placement: 'top',
+                    duration: 4000,
+                    animationType: 'slide-in'
                 })
-                .catch((error) => {
-                    toast.show(error, { type: 'danger' })
+            } else {
+                await createUser({ user: { firstName, lastName } })
+                toast.show('Användare skapad!', {
+                    type: 'success',
+                    placement: 'top',
+                    duration: 4000,
+                    animationType: 'slide-in'
                 })
-        } else {
-            // Create new user
-            createUser({ user: { firstName: firstName, lastName: lastName } })
-                .then(() => {
-                    navigation.navigate('UserList')
-                    toast.show(
-                        `Användaren ${firstName} ${lastName} har skapats!`,
-                        {
-                            type: 'success',
-                            placement: 'top',
-                            duration: 4000,
-                            animationType: 'slide-in'
-                        }
-                    )
-                    setFirstName('')
-                    setLastName('')
-                })
-                .catch((error) => {
-                    toast.show(error, { type: 'danger' })
-                })
+            }
+        } catch (error) {
+            toast.show(error.message, { type: 'danger' })
+        } finally {
+            navigation.goBack()
         }
     }
 
@@ -89,14 +68,18 @@ export const UserForm = ({ route, navigation }) => {
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <View style={styles.parentContainer}>
                 <View style={styles.container}>
-                    <Text>{id ? 'Update your user' : 'Create your user'}</Text>
+                    <Text style={styles.title}>
+                        {isUpdatingUser
+                            ? 'Update your user'
+                            : 'Create your user'}
+                    </Text>
                     <Input
                         returnKeyType="next"
-                        onSubmitEditing={() => lastNameRef.current.focus()}
+                        onSubmitEditing={() => lastNameRef.current?.focus()}
                         blurOnSubmit={false}
                         value={firstName}
                         disabled={isCreating || isUpdating}
-                        onChangeText={(text) => setFirstName(text)}
+                        onChangeText={setFirstName}
                         placeholder="First name"
                     />
                     <Input
@@ -104,15 +87,15 @@ export const UserForm = ({ route, navigation }) => {
                         value={lastName}
                         disabled={isCreating || isUpdating}
                         returnKeyType="send"
-                        onSubmitEditing={() => handleSubmit()}
-                        onChangeText={(text) => setLastName(text)}
+                        onSubmitEditing={handleSubmit}
+                        onChangeText={setLastName}
                         placeholder="Last name"
                     />
                     <Button
-                        title={id ? 'Update user' : 'Create user'}
+                        title={isUpdatingUser ? 'Update user' : 'Create user'}
                         disabled={isCreating || isUpdating}
                         loading={isCreating || isUpdating}
-                        onPress={() => handleSubmit()}
+                        onPress={handleSubmit}
                     />
                 </View>
             </View>
@@ -126,11 +109,15 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderColor: '#eee',
         borderWidth: 1,
-        borderRadius: 16
+        borderRadius: 16,
+        justifyContent: 'center'
     },
     container: {
-        flex: 1,
         padding: 16,
         alignItems: 'center'
+    },
+    title: {
+        fontSize: 20,
+        marginBottom: 20
     }
 })
