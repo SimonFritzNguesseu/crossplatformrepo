@@ -5,6 +5,8 @@ import React from "react";
 import { ToastProvider } from "react-native-toast-notifications";
 import { Provider, useSelector } from "react-redux";
 
+import PostForm from "./src/screens/PostForm/PostForm";
+import PostList from "./src/screens/PostList/PostList";
 import { UserForm } from "./src/screens/UserForm/UserForm";
 import { UserInfo } from "./src/screens/UserInfo/UserInfo";
 import UserList from "./src/screens/UserList/UserList";
@@ -31,19 +33,23 @@ const NavigationWrapper = () => {
     <NavigationContainer>
       <Tab.Navigator>
         <Tab.Screen
-          name="UserListStack"
+          name="User List"
           component={UserListStackScreen}
           options={{ headerShown: false }}
         />
         <Tab.Screen name="Create User" component={UserForm} />
         {loggedInAs && (
-          <Tab.Screen
-            name="UserInfo"
-            component={UserInfo}
-            options={{
-              title: `${loggedInAs.firstName} ${loggedInAs.lastName}`,
-            }}
-          />
+          <>
+            <Tab.Screen name="Create Post" component={PostForm} />
+            <Tab.Screen name="Posts" component={PostList} />
+            <Tab.Screen
+              name="UserInfo"
+              component={UserInfo}
+              options={{
+                title: `${loggedInAs.firstName} ${loggedInAs.lastName}`,
+              }}
+            />
+          </>
         )}
       </Tab.Navigator>
     </NavigationContainer>
