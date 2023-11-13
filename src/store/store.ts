@@ -4,6 +4,13 @@ import { usersApi } from './api/usersApi'
 //import { postsApi } from './api/postsApi'
 import authSlice from './slices/authSlice'
 
+const middlewares = [usersApi.middleware]
+
+if (process.env.NODE_ENV === `development`) {
+    const { logger } = require(`redux-logger`)
+    middlewares.push(logger)
+}
+
 export const store = configureStore({
     reducer: {
         [usersApi.reducerPath]: usersApi.reducer,
@@ -12,7 +19,7 @@ export const store = configureStore({
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(
-            usersApi.middleware,
+            ...middlewares
             //postsApi.middleware // <-- lägg till
         )
 })
