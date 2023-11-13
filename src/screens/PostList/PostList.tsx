@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 
-import { useGetPostsQuery } from "../../store/api/postsApi"; // Antag att detta är din API-hook för att häämta posts
+import { useGetPostsQuery } from "../../store/api/postsApi";
 
 const PostList = () => {
   const { data: posts, isLoading, isError } = useGetPostsQuery({});
+
+  console.log(posts); // Lägg till denna rad för att logga posts
 
   if (isLoading) {
     return <Text>Loading posts...</Text>;
@@ -32,6 +34,7 @@ const PostList = () => {
   );
 };
 
+// Dina stilar förblir desamma
 const styles = StyleSheet.create({
   postContainer: {
     backgroundColor: "white",

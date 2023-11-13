@@ -1,4 +1,5 @@
 import { ListItem } from "@rneui/themed";
+import { useMemo } from "react";
 import { View, Text, FlatList, RefreshControl, Button } from "react-native";
 
 import {
@@ -7,9 +8,19 @@ import {
 } from "../../store/api/usersApi";
 
 const UserList = ({ navigation }) => {
-  console.log("on list");
   const { data, isLoading, refetch } = useGetUsersQuery({});
   const [deleteUser] = useDeleteUserMutation();
+
+  const sortedData = useMemo(() => {
+    if (!data) return [];
+
+    // Skapa en kopia av data och sortera kopian
+    return [...data].sort((a, b) => {
+      const firstNameCompare = a.firstName.localeCompare(b.firstName);
+      if (firstNameCompare !== 0) return firstNameCompare;
+      return a.lastName.localeCompare(b.lastName);
+    });
+  }, [data]);
 
   const handleDelete = async (id) => {
     await deleteUser(id);
@@ -19,13 +30,14 @@ const UserList = ({ navigation }) => {
   const handleNavigateToUserInfo = (user) => {
     navigation.navigate("UserInfo", { user });
   };
+
   return (
     <View>
       {isLoading ? (
         <Text>Loading...</Text>
       ) : (
         <FlatList
-          data={data}
+          data={sortedData}
           refreshControl={
             <RefreshControl refreshing={isLoading} onRefresh={refetch} />
           }

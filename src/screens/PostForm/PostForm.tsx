@@ -38,7 +38,7 @@ const PostForm = () => {
     console.log("Post data being sent:", postData);
 
     try {
-      await createPost(postData);
+      await createPost({ post: postData });
       toast.show("Post created successfully!", {
         type: "success",
         placement: "top",
