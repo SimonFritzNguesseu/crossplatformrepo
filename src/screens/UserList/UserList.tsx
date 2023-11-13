@@ -1,5 +1,6 @@
-import { View, Text, FlatList, RefreshControl, Button } from 'react-native'
 import { ListItem } from '@rneui/themed'
+import { View, Text, FlatList, RefreshControl, Button } from 'react-native'
+
 import {
     useGetUsersQuery,
     useDeleteUserMutation
@@ -55,8 +56,6 @@ const UserList = ({ navigation }) => {
                     keyExtractor={(item) => item.id.toString()}
                 />
             )}
-
-
         </View>
     )
 }

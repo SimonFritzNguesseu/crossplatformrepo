@@ -1,8 +1,9 @@
+import { Button, Text } from '@rneui/themed'
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
-import { Button, Text } from '@rneui/themed'
-import { logIn, logOut } from '../../store/slices/authSlice'
 import { useDispatch, useSelector } from 'react-redux'
+
+import { logIn, logOut } from '../../store/slices/authSlice'
 
 export const UserInfo = ({ route, navigation }) => {
     const loggedInAs = useSelector((state: any) => state.auth.loggedInAs)
@@ -23,9 +24,7 @@ export const UserInfo = ({ route, navigation }) => {
                                 title="Logga ut"
                                 color="error"
                             />
-
                         </View>
-
                     </>
                 ) : (
                     <View style={styles.buttonWrapper}>
