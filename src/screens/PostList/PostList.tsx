@@ -1,20 +1,32 @@
 import React from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
+import { useSelector } from "react-redux";
 
 import { useGetPostsQuery } from "../../store/api/postsApi";
 
 const PostList = () => {
-  const { data: posts, isLoading, isError } = useGetPostsQuery({});
+  const loggedInAs = useSelector((state: any) => state.auth.loggedInAs);
 
-  console.log(posts); // Lägg till denna rad för att logga posts
+  // Använda en query parameter för att hämta alla inlägg
+  const { data: allPosts, isLoading, isError } = useGetPostsQuery({});
+
+  console.log(allPosts);
 
   if (isLoading) {
     return <Text>Loading posts...</Text>;
   }
 
-  if (isError || !posts) {
+  if (isError || !allPosts) {
     return <Text>Failed to load posts.</Text>;
   }
+
+  // Filtrera offentliga inlägg (private = false)
+  const publicPosts = allPosts.filter((post) => !post.private);
+
+  // Filtrera privata inlägg (private = true) där createdBy är samma som loggedInAs
+  const privatePosts = allPosts.filter(
+    (post) => post.private && post.createdBy === loggedInAs?.id,
+  );
 
   const renderItem = ({ item }) => (
     <View style={styles.postContainer}>
@@ -26,15 +38,24 @@ const PostList = () => {
   );
 
   return (
-    <FlatList
-      data={posts}
-      renderItem={renderItem}
-      keyExtractor={(item, index) => `post-${index}`}
-    />
+    <View>
+      <Text style={styles.sectionTitle}>Public Posts</Text>
+      <FlatList
+        data={publicPosts}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => `post-${index}`}
+      />
+
+      <Text style={styles.sectionTitle}>Private Posts</Text>
+      <FlatList
+        data={privatePosts}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => `private-post-${index}`}
+      />
+    </View>
   );
 };
 
-// Dina stilar förblir desamma
 const styles = StyleSheet.create({
   postContainer: {
     backgroundColor: "white",
@@ -58,6 +79,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "grey",
     marginTop: 5,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 16,
+    marginBottom: 8,
   },
 });
 

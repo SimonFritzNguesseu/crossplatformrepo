@@ -1,6 +1,7 @@
 import { ListItem } from "@rneui/themed";
 import { useMemo } from "react";
 import { View, Text, FlatList, RefreshControl, Button } from "react-native";
+import { useToast } from "react-native-toast-notifications";
 
 import {
   useGetUsersQuery,
@@ -10,11 +11,11 @@ import {
 const UserList = ({ navigation }) => {
   const { data, isLoading, refetch } = useGetUsersQuery({});
   const [deleteUser] = useDeleteUserMutation();
+  const toast = useToast();
 
   const sortedData = useMemo(() => {
     if (!data) return [];
 
-    // Skapa en kopia av data och sortera kopian
     return [...data].sort((a, b) => {
       const firstNameCompare = a.firstName.localeCompare(b.firstName);
       if (firstNameCompare !== 0) return firstNameCompare;
@@ -23,8 +24,17 @@ const UserList = ({ navigation }) => {
   }, [data]);
 
   const handleDelete = async (id) => {
-    await deleteUser(id);
-    refetch();
+    try {
+      await deleteUser(id).unwrap();
+      refetch();
+      toast.show("User and their posts deleted successfully!", {
+        type: "success",
+      });
+    } catch (error) {
+      toast.show("Failed to delete user and their posts.", {
+        type: "danger",
+      });
+    }
   };
 
   const handleNavigateToUserInfo = (user) => {

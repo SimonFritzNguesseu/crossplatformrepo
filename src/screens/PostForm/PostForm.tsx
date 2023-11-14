@@ -1,5 +1,5 @@
-import { Input, Button } from "@rneui/themed";
-import { useState } from "react";
+import { Input, Button, CheckBox } from "@rneui/themed";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -15,6 +15,7 @@ import { useCreatePostMutation } from "../../store/api/postsApi";
 const PostForm = () => {
   const loggedInAs = useSelector((state: any) => state.auth.loggedInAs);
   const [postText, setPostText] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false); // New state for private checkbox
   const [createPost, { isLoading }] = useCreatePostMutation();
   const toast = useToast();
 
@@ -31,8 +32,9 @@ const PostForm = () => {
 
     const postData = {
       text: postText,
-      createdBy: loggedInAs?.id, // Se till att loggedInAs.id är giltig
+      createdBy: loggedInAs?.id,
       createdDate: new Date().toLocaleDateString(),
+      private: isPrivate, // Add the private field to postData
     };
 
     console.log("Post data being sent:", postData);
@@ -63,6 +65,11 @@ const PostForm = () => {
             placeholder="Post text"
             returnKeyType="send"
             onSubmitEditing={handleSubmit}
+          />
+          <CheckBox
+            title="Private"
+            checked={isPrivate}
+            onPress={() => setIsPrivate(!isPrivate)}
           />
           <Button
             title="Create post"
