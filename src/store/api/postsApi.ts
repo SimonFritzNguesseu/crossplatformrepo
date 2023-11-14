@@ -33,10 +33,6 @@ const firebaseBaseQuery = async ({ baseUrl, url, method, body }) => {
         console.log(`Deleting post in Firestore with ID: ${body.postId}`);
         await deleteDoc(doc(db, url, body.postId));
         return { data: { id: body.postId } };
-      /*case "DELETE":
-        console.log(`Deleting post in Firestore with ID: ${body}`);
-        await deleteDoc(doc(db, url, body));
-        return { data: { id: body } };*/
 
       default:
         throw new Error(`Unhandled method ${method}`);
